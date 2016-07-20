@@ -1,0 +1,26 @@
+{
+  "name": "spelling-practice",
+  "homepage": "https://github.com/tmcmaster/spelling-practice",
+  "authors": [
+    "tmcmaster <tim@mcmaster.id.au>"
+  ],
+  "description": "Application for practising spelling",
+  "main": "index.html",
+  "keywords": [
+    "spelling",
+    "practice"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "iron-elements": "PolymerElements/iron-elements#^1.0.10",
+    "paper-elements": "PolymerElements/paper-elements#^1.0.7"
+  }
+}

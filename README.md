@@ -1,2 +1,2 @@
 # spelling-practice
-Application for practicing spelling 
+Application for practising spelling 
