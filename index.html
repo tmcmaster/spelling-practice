@@ -27,7 +27,8 @@
   <link rel="import" href="elements/elements.html">
   <!--<style is="custom-style" include="shared-styles"></style>-->
   
-  <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
+  <!--<script src='https://code.responsivevoice.org/responsivevoice.js'></script>-->
+  <script src='scripts/responsivevoice.js'></script>
   
   <style>
       body { 
@@ -69,7 +70,7 @@
 
 <body unresolved>
     <paper-material>
-      <h2>Practice Spelling</h2>
+      <h2>Spelling Practice (version 0.4)</h2>
       <paper-card id="setupPanel">
           <paper-input id="wordsInput" label="The words you would like to try and spell" value="Hello world"></paper-input>
           <paper-button id="startButton" onclick="start()" raised>Start</paper-button>
@@ -83,6 +84,7 @@
     </paper-material>
     
     <script type="text/javascript">
+      //var v = window.speechSynthesis.getVoices();
       var wordList = [];
       var completed = [];
       var word = "";
@@ -105,18 +107,27 @@
       }
       function done() {
         var answer = document.getElementById("answerInput").value;
-        window.responsiveVoice.speak("Your answer was " + answer);
-        if (answer.toLowerCase() === word.toLowerCase()) {
-          window.responsiveVoice.speak("Well done.");
-          choose();
+        answer = answer.trim();
+        if (answer === "")
+        {
+            window.responsiveVoice.speak("Your answer was blank. Please spell the word " + word + ", and then press done.");
+            answer.focus();
         }
         else
         {
-          //window.responsiveVoice.speak("Try again please.");
-          var answer = document.getElementById("answerInput");
-          answer.value = "";
-          answer.focus();
-          window.responsiveVoice.speak("Please spell the word " + word + ", and then press done.");
+          window.responsiveVoice.speak("Your answer was " + answer);
+          if (answer.toLowerCase() === word.toLowerCase()) {
+            window.responsiveVoice.speak("Well done.");
+            choose();
+          }
+          else
+          {
+            window.responsiveVoice.speak("Try again please.");
+            var answer = document.getElementById("answerInput");
+            answer.value = "";
+            answer.focus();
+            window.responsiveVoice.speak("Please spell the word " + word + ", and then press done.");
+          }
         }
       }
       function choose() {
@@ -124,8 +135,7 @@
         answer.value = "";
         answer.focus();
         word = getWord();
-        window.responsiveVoice.speak("Please spell the word:");
-        window.responsiveVoice.speak(word);
+        window.responsiveVoice.speak("Please spell the word " + word);
       }
       function resetWordList() {
           for (var i=0; i < completed.length; i++) {
