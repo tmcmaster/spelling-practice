@@ -1,0 +1,36 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../elements.html">
+
+<dom-module id="tm-voice">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+  </template>
+
+  <script src='../../scripts/responsivevoice.js'></script>
+  <script>
+    (function(Polymer, ResponsiveVoice) {
+      'use strict';
+      Polymer({
+        is: 'tm-voice',
+        properties: {
+          language: {
+            type: String,
+            value: 'en'
+          },
+          voice: {
+            type: String,
+            value: 'UK English Female'
+          }
+        },
+        say: function(message) {
+          console.log('SPOKEN: ' + message);
+          ResponsiveVoice.speak(message, this.voice);
+        }
+      });
+    })(window.Polymer, window.responsiveVoice);
+  </script>
+</dom-module>

@@ -1,0 +1,193 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../elements.html">
+
+<dom-module id="tm-word-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      fieldset {
+        width:200px;
+        float:left;
+      }
+      .debug-false {
+        display:none;
+      }
+    </style>
+    <div class$="debug-[[debug]]">
+      <fieldset>
+        <legend>Current Word</legend>
+        <ul>
+            <li>{{word}}</li>
+        </ul>
+      </fieldset>
+      <fieldset>
+        <legend>Completed Words</legend>
+        <ul>
+          <template is="dom-repeat" items="{{completedWords}}" as="c">
+            <li>{{c}}</li>
+          </template>
+        </ul>
+        </fieldset>
+      <fieldset>
+        <legend>Remaining Words</legend>
+        <ul>
+          <template is="dom-repeat" items="{{remainingWords}}" as="r">
+            <li>{{r}}</li>
+          </template>
+        </ul>
+      </fieldset>
+      <fieldset>
+        <legend>Skipped Words</legend>
+        <ul>
+          <template is="dom-repeat" items="{{skippedWords}}" as="s">
+            <li>{{s}}</li>
+          </template>
+        </ul>
+      </fieldset>
+    </div>
+  </template>
+
+  <script>
+    (function(Polymer) {
+      'use strict';
+      Polymer({
+        is: 'tm-word-list',
+        properties: {
+          debug: {
+            type: String,
+            value: "false"
+          },
+          skippedWords : {
+            type: Array,
+            value: []
+          },
+          remainingWords: {
+            type: Array,
+            value: []
+          },
+          word: {
+            type: String,
+            value: ''
+          },
+          lastTry: {
+            type: String,
+            value: ''
+          },
+          completedWords : {
+            type: Array,
+            value: []
+          },
+          completed : {
+            type: Boolean,
+            value: false
+          }
+        },
+        setWords: function(words) {
+          console.log('Setting a new set of words: ' + words);
+          this.remainingWords = words.split(' ');
+          var number = this.remainingWords.length;
+          this._selectWord();
+          return number;
+        },
+        _selectWord: function() {
+          if (this.remainingWords.length === 0)
+          {
+            if (this.hasSkippedWords())
+            {
+              this.redoSkippedWords();
+            }
+            else
+            {
+              this.completed = true;
+            }
+          }
+          if (!this.completed)
+          {
+            var r = Math.floor(Math.random() * this.remainingWords.length);
+            this.word = this.remainingWords[r];
+            console.log('New selected word: ' + this.word);
+            this.splice("remainingWords", r, 1);
+          }
+          else
+          {
+            this.word = undefined;
+          }
+          
+          return this.word;
+        },
+        getCurrentWord: function() {
+          return this.word;
+        },
+        skipWord: function() {
+          this.skippedWords.push(this.word);
+          this.notifyPath("skippedWords", this.skippedWords.slice());
+          this._selectWord();
+        },
+        getRemainingWords: function() {
+          return this.remainingWords;
+        },
+        getCorrectWords: function() {
+          return this.completedWords;
+        },
+        getSkippedWords: function() {
+          return this.skippedWords;
+        },
+        isCompleted: function() {
+          return (this.skippedWords.length === 0
+                    && this.remainingWords.length === 0 
+                    && this.word === undefined);
+        },
+        hasSkippedWords: function() {
+          return (this.skippedWords.length > 0);
+        },
+        redoSkippedWords: function() {
+          for (var i=0; i<this.skippedWords.length; i++)
+          {
+            this.remainingWords.push(this.skippedWords[i]);
+            this.notifyPath("remainingWords", this.remainingWords.slice());
+          }
+          this.skippedWords = [];
+        },
+        redoCompletedWords: function() {
+          for (var i=0; i<this.completedWords.length; i++)
+          {
+            this.remainingWords.push(this.completedWords[i]);
+            this.notifyPath("remainingWords", this.remainingWords.slice());
+          }
+          this.completedWords = [];
+        },
+        checkWord: function(word) {
+          this.lastTry = word;
+          if (word !== undefined && word.toLowerCase() === this.word.toLowerCase())
+          {
+            this.completedWords.push(this.word);
+            this.notifyPath("completedWords", this.completedWords.slice());
+            this._selectWord();
+            this.lastTry = '';
+            return true;
+          }
+          else
+          {
+            return false;
+          }
+        },
+        getLastTry: function() {
+          return this.lastTry;
+        },
+        reset: function() {
+          this.completed = false;
+          this.redo();
+        },
+        redo: function() {
+          this.redoCompletedWords();
+          this.redoSkippedWords();
+          this.remainingWords.push(this.word);
+          this.notifyPath("remainingWords", this.remainingWords.slice());
+          this._selectWord();
+        }
+      });
+    })(window.Polymer);
+  </script>
+</dom-module>

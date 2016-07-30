@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="Demo tm-speak Web Component">
+
+  <title>Demo tm-word-list Web Component</title>
+
+  <meta name="theme-color" content="#2E3AA1">
+  <link rel="manifest" href="manifest.json">
+  <meta name="msapplication-TileColor" content="#3372DF">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="PSK">
+  <link rel="icon" sizes="192x192" href="../images/touch/chrome-touch-icon-192x192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Demo tm-word-list Web Component">
+  <link rel="apple-touch-icon" href="../images/touch/apple-touch-icon.png">
+  <meta name="msapplication-TileImage" content="../images/touch/ms-touch-icon-144x144-precomposed.png">
+
+  <link rel="stylesheet" href="../styles/main.css">
+  <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../elements/elements.html">
+  <style>
+      h2 {
+          text-align:center;
+      }
+  </style>
+</head>
+
+<body unresolved>
+    <h2>Demo tm-word-list Web Component</h2>
+    <tm-word-list id="word-list" debug="true"/>
+    <script>
+        var wordList = document.getElementById("word-list");
+        wordList.setWords('cat dog frog bunny box mum dad amelie jordy');
+    
+        setTimeout(function() {
+            console.log("Getting a word right");
+            var word = wordList.getCurrentWord();
+            var correct = wordList.checkWord(word);
+            word = wordList.getCurrentWord();
+            console.log("Skipping 3 words");
+            word = wordList.skipWord();
+            word = wordList.skipWord();
+            word = wordList.skipWord();
+        }, 1000);
+        
+        setTimeout(function() {
+            var remainingWords = wordList.getRemainingWords();
+            var correctWords = wordList.getCorrectWords();
+            var skippedWords = wordList.getSkippedWords();
+            var completed = wordList.isCompleted();
+            var hasSkippedWords = wordList.hasSkippedWords();
+            console.log("Redoing the skipped words");
+            wordList.redoSkippedWords();
+        }, 2000);
+        
+        setTimeout(function() {
+            var remainingWords = wordList.getRemainingWords();
+            var word = wordList.getCurrentWord();
+            console.log("Getting a word wrong");
+            var correct = wordList.checkWord("dig");
+            word = wordList.getCurrentWord();
+            var lastTry = wordList.getLastTry();
+        }, 3000);
+        
+        setTimeout(function() {
+            console.log("Redoing all of the words");
+            wordList.redo();
+        }, 4000);
+            
+        setTimeout(function() {
+            console.log("REMAINING: " + wordList.getRemainingWords());
+            console.log("COMPLETED: " + wordList.getCorrectWords());
+            console.log("  SKIPPED: " + wordList.getSkippedWords());
+        }, 5000);
+    </script>
+</body>
