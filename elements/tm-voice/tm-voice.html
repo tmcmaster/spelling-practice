@@ -10,27 +10,92 @@
     </style>
   </template>
 
-  <script src='../../scripts/responsivevoice.js'></script>
   <script>
-    (function(Polymer, ResponsiveVoice) {
+  
+    (function(Polymer, SpeechSynthesis, SpeechSynthesisUtterance) {
       'use strict';
       Polymer({
         is: 'tm-voice',
         properties: {
-          language: {
+          lang: {
             type: String,
-            value: 'en'
+            value: 'en-GR'
           },
           voice: {
             type: String,
-            value: 'UK English Female'
+            value: 'Google UK English Female'
+          },
+          mute : {
+            type: Boolean,
+            value: false
+          },
+          utterances : {
+            type: Array,
+            value: []
+          },
+          utterance : {
+            type: Object,
+            value: undefined
+          },
+          initialised : {
+            type: Boolean,
+            value: false
           }
         },
-        say: function(message) {
-          console.log('SPOKEN: ' + message);
-          ResponsiveVoice.speak(message, this.voice);
+        speak : function(message, rate) {
+          if (this.initialised)
+          {
+            console.log('SPEAK: ' + message);
+  					var utterance = new SpeechSynthesisUtterance(message);
+  					utterance.lang = this.lang;
+  					utterance.voice = this.selectedVoice;
+  					utterance.volume = (this.mute ? 0 : 1);
+  					utterance.rate = (rate === undefined ? 1 : rate);
+  					console.log('RATE: ' + utterance.rate);
+  					//utterance.rate = 2;
+            this.utterances.unshift(utterance);
+            this._speak();
+          }
+          else
+          {
+            console.log('ERROR: Voice has not been initialised yet');
+          }
+        },
+        _speak : function() {
+          if (this.utterance === undefined && this.utterances.length > 0)
+          {
+            this.utterance = this.utterances.pop();
+            console.log('SPOKEN: ' + this.utterance.text);
+            this.fire('tm-voice-spoke',this.utterance.text);
+            var self = this;
+            this.utterance.onend = function() {
+              self.utterance = undefined;
+              self._speak();
+            };
+            SpeechSynthesis.cancel();
+            SpeechSynthesis.speak(self.utterance);
+          }
+        },
+        ready : function() {
+          var self = this;
+          setTimeout(function() {
+					  self.selectedVoice = getVoice(self.lang, self.voice);
+					  self.initialised = true;
+					  self._speak();
+          }, 1000);
         }
       });
-    })(window.Polymer, window.responsiveVoice);
+      
+      function getVoice(lang, name) {
+        var voices = SpeechSynthesis.getVoices();
+        console.log(voices);
+        var voiceOptions = voices.filter(function(voice) {
+            return (name !== undefined ? voice.name == name : voice.lang == lang);
+        });
+        return (voiceOptions.length > 0 ? voiceOptions[0]
+                  : (voices.length > 0 ? voices[0] : undefined));
+      }
+      
+    })(window.Polymer, window.speechSynthesis, window.SpeechSynthesisUtterance);
   </script>
 </dom-module>

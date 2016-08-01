@@ -29,9 +29,26 @@
 
 <body unresolved>
     <h2>Demo tm-speak Web Component</h2>
-    <tm-voice id="voice"/>
+    <tm-voice id="voice" mute="true"/>
     <script>
+        //window.chrome.tts.speak('Hello, world.');
+        // var voices = window.speechSynthesis.getVoices();
+        // console.log('voices: ' + voices.length);
+        // var utterance = new window.SpeechSynthesisUtterance('Hello Treehouse');
+        //utterance.lang = "en";
+        //utterance.voice = voices.filter(function(voice) { return true; })[0];
+        // window.speechSynthesis.speak(utterance);
+
         var voice = document.getElementById("voice");
-        voice.say('What would you like me to say?');
+        setTimeout(function() {
+            voice.speak('Say the word cat.');
+            voice.speak('Say the word dog.');
+            voice.speak('Say the word fish.');
+            voice.speak('Say the word bunny.');
+        }, 1000);
+        
+        // setTimeout(function() {
+        //     voice.say('What would you like me to say?');
+        // }, 2000);
     </script>
 </body>

@@ -33,48 +33,88 @@
       h2 {
         text-align:center;
       }
-      #wordsInput {
+      iron-autogrow-textarea {
         margin-top:10px;
         height: 50px;
-        width:99%;
+        width:50%;
       }
       .hidden {
         display:none;
       }
+
     </style>
+
+    <!-- {"rules":{".read":"auth != null",".write":"auth != null"}} -->
+    <firebase-document
+        app-name="spelling-practice-9e8c5"
+        path="/words"
+        data="{{w}}">
+    </firebase-document>
+    <firebase-query
+        id="query"
+        app-name="spelling-practice-9e8c5"
+        path="/words"
+        data="{{w}}">
+    </firebase-query>
+    <iron-localstorage id="storage"
+      name="tm-spelling-practice"
+      value="{{storage}}"
+      on-iron-localstorage-load-empty="initializeDefaults"
+      on-iron-localstorage-load="storageLoaded">
+    </iron-localstorage>
+  
     <div class="wrapper">
       <div class="container">
-        <!--<span>{{done}}</span> of <span>{{size}}</span>-->
         <h2>Spelling Practice</h2>
         <paper-progress value="{{done}}" min="0" max="{{size}}" class="red"></paper-progress>
         <iron-pages selected="{{page}}">
           <div>
+            <paper-card id="configPanel">
+              <paper-checkbox checked="{{storage.settings.mute}}" noink>Mute</paper-checkbox>
+              <paper-checkbox checked="{{storage.settings.subtitles}}" noink>Subtitles</paper-checkbox>
+              <paper-button id="saveSettingsButton" on-tap="save" raised>Save</paper-button>
+            </paper-card>
+          </div>
+          <div>
             <paper-card id="setupPanel">
-              <label for="wordsInput">The words you would like to try and spell</label>
-              <iron-autogrow-textarea id="wordsInput" value="{{words}}"></iron-autogrow-textarea>
+              <paper-input id="wordsInput" label="The words you would like to try and spell" value="{{words}}"></paper-input>
+              <paper-dropdown-menu label="Word Set">
+                <paper-menu attr-for-selected="value" selected="{{wordSet}}" class="dropdown-content">
+                  <paper-item value="jordy">Jordy</paper-item>
+                  <paper-item value="amelie">Amelie</paper-item>
+                </paper-menu>
+              </paper-dropdown-menu>              
+              <paper-button id="saveButton" on-tap="save" raised>Save</paper-button>
+              <paper-button id="restoreButton" on-tap="restore" raised>Restore</paper-button>
             </paper-card>
           </div>
           <div>
             <paper-card id="playPanel">
                 <paper-input id="answerInput" label="Answer goes here" value="{{word}}"></paper-input>
                 <paper-button id="doneButton" on-tap="check" raised>Check</paper-button>
+                <paper-button id="repeatButton" on-tap="repeat" raised>Repeat</paper-button>
                 <paper-button id="skipButton" on-tap="skip" raised>Skip</paper-button>
+                <paper-button id="hintButton" on-tap="hint" raised>Hint</paper-button>
             </paper-card>
+            <paper-toast id="toast" duration="1000" dynamicAlign="true" />
+            <paper-toast id="aaa" duration="1000" dynamicAlign="true" />
           </div>
         </iron-pages>
         <paper-tabs selected="{{page}}" noink>
-          <paper-tab>Setup</paper-tab>
+          <paper-tab>Settings</paper-tab>
+          <paper-tab>Word List</paper-tab>
           <paper-tab on-tap="play">Play</paper-tab>
         </paper-tabs>
       </div>
     </div>
     <div class="hidden">
       <tm-word-list id="words"/>
-      <tm-voice id="voice"/>
+      <tm-voice id="voice" mute="{{storage.settings.mute}}" />
     </div>
   </template>
 
   <script>
+      
     (function(Polymer) {
       'use strict';
       
@@ -83,7 +123,7 @@
         properties: {
           page : {
             type:Number,
-            value:0
+            value:1
           },
           size : {
             type:Number,
@@ -93,26 +133,65 @@
             type:Number,
             value:0
           },
-          progress : {
-            type: Object,
-            value : {
-              size : 4,
-              done : 2
-            }
-          },
           words: {
-            type:String,
-            value: 'cat bunny frog dog'
+            type: String,
+            value: 'my me mine by'
+            //value: 'cat bunny frog dog'
+          },
+          storage : {
+            type: Object,
+            value: undefined
           },
           word: {
             type: String,
             value: ''
+          },
+          wordSet : {
+            type: String,
+            value: 'jordy',
+            observer: 'wordSetChanged'
           }
+        },
+        initializeDefaults: function() {
+          console.log('STORAGE: Initalising storage with defaults');
+          this.storage = {
+            'words' : {
+              'jordy' : 'me my mine by from love',
+              'amelie' : 'cat dog frog fox bunny fish'
+            },
+            'settings' : {
+              'mute' : true,
+              'subtitles' : true
+            }
+          };
+        },
+        wordSetChanged : function(newWordSet) {
+          console.log('Word set has changed: ' + newWordSet);
+          if (this.storage !== undefined)
+          {
+            this.words = this.storage.words[newWordSet];
+          }
+        },
+        storageLoaded : function() {
+          console.log('STORAGE: Storage has been loaded.');
+          this.words = this.storage.words[this.wordSet];
+          console.log("STORAGE:      mute = " + this.storage.settings.mute);
+          console.log("STORAGE: subtitles = " + this.storage.settings.subtitles);
+        },
+        save : function() {
+          this.storage.words[this.wordSet] = this.words;
+          this.$.storage.save();
+        },
+        restore : function() {
+          this.$.storage.reload();
+          this.words = this.storage.words[this.wordSet];
         },
         play: function() {
           console.log('START button pressed.');
-          this.$.voice.say("Let's get started.");
+          console.log(this.w);
+          this.$.voice.speak("Let's get started.");
           this.size = this.$.words.setWords(this.words);
+          this.done = 0;
           this.page = 1;
           this.question(this.$.words.getCurrentWord());
           focus(this.$.answerInput);
@@ -121,14 +200,20 @@
           console.log('DONE button pressed.');
           if (this.$.words.checkWord(this.word))
           {
-            this.$.voice.say("Well done.");
+            this.$.voice.speak("You spelt");
+            this.$.voice.speak(this.word, 0.5);
+            this.$.voice.speak("Well done.");
             this.done = this.$.words.getCorrectWords().length;
             this.word = '';
-            focus(this.$.answerInput);
-            this.question(this.$.words.getCurrentWord());
             if (this.$.words.isCompleted())
             {
-              this.page = 0;
+              this.page = 1;
+              this.$.voice.speak("You have completed all of the words. Press 'play' to do them again.");
+            }
+            else
+            {
+              focus(this.$.answerInput);
+              this.question(this.$.words.getCurrentWord());
             }
           }
           else
@@ -136,22 +221,46 @@
             this.feedback(this.word, this.$.words.getCurrentWord());
           }
         },
+        repeat : function() {
+            focus(this.$.answerInput);
+            this.question(this.$.words.getCurrentWord());
+        },
         skip : function() {
           console.log('SKIP button pressed.');
           this.$.words.skipWord();
           focus(this.$.answerInput);
           this.question(this.$.words.getCurrentWord());
         },
+        hint: function() {
+          var word = this.$.words.getCurrentWord();
+          this.$.toast.text = word;
+          this.$.toast.duration = 1000;
+          this.$.toast.show();
+          focus(this.$.answerInput);
+        },
         question : function(word) {
-          this.$.voice.say("Please spell " + word + ", and then press Check.");
+            this.$.voice.speak("Please spell ");
+            this.$.voice.speak(word, 0.5);
+            this.$.voice.speak("and then press 'Check'.");
         },
         feedback : function(spelling, word) {
-          this.$.voice.say("You spelt " + spelling + ".");
+          this.$.voice.speak("You spelt " + spelling);
           focus(this.$.answerInput);
           this.question(word);
         },
         ready: function() {
           console.log('Spelling Practice ready to go.');
+            var self = this;
+            this.$.voice.addEventListener('tm-voice-spoke', function(text) {
+              if (self.storage.settings.subtitles)
+              {
+                console.log('SUBTITLE: ' + text.detail);
+                self.$.toast.hide();
+                self.$.toast.text = text.detail;
+                self.$.toast.duration = 3000;
+                self.$.toast.show();
+              }
+            });
         }
       });
 
@@ -164,3 +273,7 @@
     })(window.Polymer);
   </script>
 </dom-module>
+
+
+<!--<label for="wordsInput">The words you would like to try and spell</label>-->
+<!--<iron-autogrow-textarea id="wordsInput" value="{{words}}"></iron-autogrow-textarea>-->

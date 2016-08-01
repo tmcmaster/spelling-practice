@@ -5,9 +5,9 @@
   <meta charset="utf-8">
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="generator" content="Polymer Starter Kit">
+  <meta name="generator" content="Spelling Practice">
 
-  <title>Practice Spelling</title>
+  <title>Spelling Practice</title>
 
   <meta name="theme-color" content="#2E3AA1">
   <link rel="manifest" href="manifest.json">
@@ -17,144 +17,22 @@
   <link rel="icon" sizes="192x192" href="../images/touch/chrome-touch-icon-192x192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Polymer Starter Kit">
+  <meta name="apple-mobile-web-app-title" content="Spelling Practice">
   <link rel="apple-touch-icon" href="../images/touch/apple-touch-icon.png">
   <meta name="msapplication-TileImage" content="../images/touch/ms-touch-icon-144x144-precomposed.png">
 
   <link rel="stylesheet" href="../styles/main.css">
-  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="bower_components/polymer/polymer.html">
-  <link rel="import" href="elements/elements.html">
-  <!--<style is="custom-style" include="shared-styles"></style>-->
-  
-  <!--<script src='https://code.responsivevoice.org/responsivevoice.js'></script>-->
-  <script src='scripts/responsivevoice.js'></script>
-  
+  <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../bower_components/polymer/polymer.html">
+  <link rel="import" href="../elements/elements.html">
   <style>
-      body { 
-        //max-height: 500px;
-        //border:solid red 1px;
-      }
-      
-      h2 {
-        padding:15px;
-        //margin:10px;
-        border:solid black 5px;
-        width:500px;
-        box-sizing:border-box;
-      }
-      paper-card {
-        //margin:10px;
-        padding:5px;
-        width:100%;
-        //width:500px;
-      }
-      paper-material {
-        display:inline-block;
-        max-width:500px;
-        max-height:250px;
-        margin-top:auto;
-        margin-bottom:auto;
-        margin-left:auto;
-        margin-right:auto;
-        //border:solid red 1px;
-      }
-      paper-button {
-        float: right;
-      }
-      .hidden {
-        display:none;
-      }
+    h2 {
+        text-align:center;
+    }
   </style>
+
 </head>
 
 <body unresolved>
-    <paper-material>
-      <h2>Spelling Practice (version 0.4)</h2>
-      <paper-card id="setupPanel">
-          <paper-input id="wordsInput" label="The words you would like to try and spell" value="Hello world"></paper-input>
-          <paper-button id="startButton" onclick="start()" raised>Start</paper-button>
-      </paper-card>
-      <paper-card id="playPanel" class="hidden">
-          <paper-input id="answerInput" label="Answer goes here" value="">
-          </paper-input>
-          <paper-button id="doneButton" onclick="done()" raised>Done</paper-button>
-          <paper-button id="doneReset" onclick="reset()" raised>Reset</paper-button>
-      </paper-card>
-    </paper-material>
-    
-    <script type="text/javascript">
-      //var v = window.speechSynthesis.getVoices();
-      var wordList = [];
-      var completed = [];
-      var word = "";
-      function start() {
-        var playPanel = document.getElementById("playPanel");
-        playPanel.classList.remove("hidden");
-        var setupPanel = document.getElementById("setupPanel");
-        setupPanel.classList.add("hidden");
-        var wordsInput = document.getElementById("wordsInput");
-        var wordsString = wordsInput.value;
-        wordList = wordsString.split(" ")
-        completed = [];
-        choose();
-      }
-      function reset() {
-        var playPanel = document.getElementById("playPanel");
-        playPanel.classList.add("hidden");
-        var setupPanel = document.getElementById("setupPanel");
-        setupPanel.classList.remove("hidden");
-      }
-      function done() {
-        var answer = document.getElementById("answerInput").value;
-        answer = answer.trim();
-        if (answer === "")
-        {
-            window.responsiveVoice.speak("Your answer was blank. Please spell the word " + word + ", and then press done.");
-            answer.focus();
-        }
-        else
-        {
-          window.responsiveVoice.speak("Your answer was " + answer);
-          if (answer.toLowerCase() === word.toLowerCase()) {
-            window.responsiveVoice.speak("Well done.");
-            choose();
-          }
-          else
-          {
-            window.responsiveVoice.speak("Try again please.");
-            var answer = document.getElementById("answerInput");
-            answer.value = "";
-            answer.focus();
-            window.responsiveVoice.speak("Please spell the word " + word + ", and then press done.");
-          }
-        }
-      }
-      function choose() {
-        var answer = document.getElementById("answerInput");
-        answer.value = "";
-        answer.focus();
-        word = getWord();
-        window.responsiveVoice.speak("Please spell the word " + word);
-      }
-      function resetWordList() {
-          for (var i=0; i < completed.length; i++) {
-              wordList.push( completed[i] );
-          }
-          completed = [];
-      }
-      function getWord() {
-        if (wordList.length === 0)
-        {
-          resetWordList();
-        }
-        var r = Math.floor(Math.random() * wordList.length);
-        word = wordList[r];
-        wordList.splice(r,1);
-        completed.push(word);
-        return word;
-      }
-    </script>
+    <tm-spelling-practice/>
 </body>
-
-</html>

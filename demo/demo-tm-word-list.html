@@ -39,6 +39,10 @@
         var wordList = document.getElementById("word-list");
         wordList.setWords('cat dog frog bunny box mum dad amelie jordy');
     
+        document.addEventListener('tm-wl-new-word', function(event) {
+            console.log('word-changed: ' + event.detail);
+        });
+        
         setTimeout(function() {
             console.log("Getting a word right");
             var word = wordList.getCurrentWord();

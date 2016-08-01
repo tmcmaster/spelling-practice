@@ -88,6 +88,9 @@
           console.log('Setting a new set of words: ' + words);
           this.remainingWords = words.split(' ');
           var number = this.remainingWords.length;
+          this.skippedWords = [];
+          this.completedWords = [];
+          this.completed = false;
           this._selectWord();
           return number;
         },
@@ -115,6 +118,7 @@
             this.word = undefined;
           }
           
+          this.fire('tm-wl-new-word',this.word);
           return this.word;
         },
         getCurrentWord: function() {
