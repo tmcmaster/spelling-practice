@@ -65,7 +65,7 @@
   
     <div class="wrapper">
       <div class="container">
-        <h2>Spelling Practice</h2>
+        <h2>Spelling Practice <i>(version 1)</i></h2>
         <paper-progress value="{{done}}" min="0" max="{{size}}" class="red"></paper-progress>
         <iron-pages selected="{{page}}">
           <div>
@@ -101,8 +101,8 @@
           </div>
         </iron-pages>
         <paper-tabs selected="{{page}}" noink>
-          <paper-tab>Settings</paper-tab>
-          <paper-tab>Word List</paper-tab>
+          <paper-tab on-tap="stop">Settings</paper-tab>
+          <paper-tab on-tap="stop">Word List</paper-tab>
           <paper-tab on-tap="play">Play</paper-tab>
         </paper-tabs>
       </div>
@@ -175,6 +175,13 @@
         storageLoaded : function() {
           console.log('STORAGE: Storage has been loaded.');
           this.words = this.storage.words[this.wordSet];
+          if (this.storage.settings === undefined)
+          {
+            this.storage.settings = {
+              mute : true,
+              subtitles : true
+            }
+          }
           console.log("STORAGE:      mute = " + this.storage.settings.mute);
           console.log("STORAGE: subtitles = " + this.storage.settings.subtitles);
         },
@@ -188,13 +195,20 @@
         },
         play: function() {
           console.log('START button pressed.');
-          console.log(this.w);
-          this.$.voice.speak("Let's get started.");
-          this.size = this.$.words.setWords(this.words);
+          if (this.page !== 2)
+          {
+            console.log(this.w);
+            this.$.voice.speak("Let's get started.");
+            this.size = this.$.words.setWords(this.words);
+            this.done = 0;
+            this.page = 2;
+            this.question(this.$.words.getCurrentWord());
+            focus(this.$.answerInput);
+          }
+        },
+        stop: function() {
+          this.$.voice.stop();
           this.done = 0;
-          this.page = 1;
-          this.question(this.$.words.getCurrentWord());
-          focus(this.$.answerInput);
         },
         check: function() {
           console.log('DONE button pressed.');

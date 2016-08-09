@@ -42,6 +42,10 @@
             value: false
           }
         },
+        stop : function() {
+          SpeechSynthesis.cancel();
+          this.utterances = [];
+        },
         speak : function(message, rate) {
           if (this.initialised)
           {

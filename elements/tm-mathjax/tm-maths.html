@@ -1,0 +1,34 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<!--<link rel="import" href="../elements.html">-->
+
+<dom-module id="tm-maths">
+
+
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    
+    <div><tm-mathjax ascii="{{ascii}}"/></div>
+    <div><tm-mathjax ascii="{{ascii}}"/></div>
+  </template>
+
+  <script>
+  
+    (function(Polymer) {
+      'use strict';
+      Polymer({
+        is: 'tm-maths',
+        properties: {
+          ascii: {
+            type: String,
+            value: 'a=F/m'
+          }
+        }
+      });
+
+    })(window.Polymer);
+  </script>
+</dom-module>

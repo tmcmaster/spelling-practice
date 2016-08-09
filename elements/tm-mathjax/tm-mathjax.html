@@ -1,0 +1,38 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<!--<link rel="import" href="../elements.html">-->
+
+<dom-module id="tm-mathjax">
+
+
+  <template>
+    <script type="text/javascript" src="../../bower_components/MathJax/MathJax.js?config=AM_HTMLorMML-full"></script>
+  
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    
+    <p>`{{ascii}}`</p>
+    
+
+  </template>
+
+  <script>
+  
+    (function(Polymer) {
+      'use strict';
+      Polymer({
+        is: 'tm-mathjax',
+        properties: {
+          ascii: {
+            type: String,
+            value: 'a=F/m'
+          }
+        }
+      });
+
+    })(window.Polymer);
+  </script>
+</dom-module>
